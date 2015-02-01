@@ -1,28 +1,25 @@
-__author__ = 'github.com/samshadwell'
+__author__ = 'github.com/samshadwell
+              github.com/jtschneck'
 
+import urllib.request
+import re
 
-def get_links(url_in):
+def get_links(url_in, regex):
     """
     Get all the links to wikipedia pages at the given url
     :param url_in: url to get links from
-    :return: list of links in arbitrary order
+    :return: set of links in arbitrary order
     """
 
-    if url_in == "A":
-        return ["B", "C"]
+    resp = urllib.request.urlopen(url_in)
+    html = str(resp.read())
 
-    elif url_in == "B":
-        return ["A"]
+    links_set = set([])
 
-    elif url_in == "C":
-        return ["D", "E"]
+    for link in regex.findall(html):
+        links_set.add("http://en.wikipedia.org" + link.split("\"")[1])
 
-    elif url_in == "D":
-        return []
+    return links_set
 
-    elif url_in == "F":
-        return ["A"]
 
-    else:
-        return []
-
+regex = re.compile('(?:a href=("\/wiki\/[^:]*?"))')
