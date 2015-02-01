@@ -1,8 +1,7 @@
-__author__ = 'github.com/samshadwell
-              github.com/jtschneck'
+__author__ = 'github.com/samshadwell, github.com/jtschneck'
 
 import urllib.request
-import re
+
 
 def get_links(url_in, regex):
     """
@@ -22,4 +21,3 @@ def get_links(url_in, regex):
     return links_set
 
 
-regex = re.compile('(?:a href=("\/wiki\/[^:]*?"))')

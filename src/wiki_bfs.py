@@ -1,6 +1,9 @@
 __author__ = 'github.com/samshadwell'
 import get_wiki_links
 import queue
+import re
+
+regex = re.compile('(?:a href=("\/wiki\/[^:]*?"))')
 
 
 def wikipedia_bfs(start_url, end_url, shortcut_mapping):
@@ -16,35 +19,36 @@ def wikipedia_bfs(start_url, end_url, shortcut_mapping):
     shortcut_mapping[end_url] = None
 
     # Initialize data structures
-    q = queue.deque()
+    q = queue.Queue()
     parents = {}
     dist = 0
     curr_path = []
     path_dist = float("inf")
 
     parents[start_url] = None
-    q.append(start_url)
+    q.put(start_url)
 
     # Check to see if the start is the end to save iterations
     if start_url == end_url:
         return [start_url, end_url]
 
-    while len(q) > 0:
+    while not q.empty():
 
-        current = q.pop()
+        current = q.get()
         dist += 1
+
+        print("Working with " + current)
 
         # If we've found a saved path that's better than we can find now, return it
         if dist >= path_dist:
             return curr_path
 
         # Go through the pages current page links to
-        for nbr in get_wiki_links.get_links(current):
-
-            parents[nbr] = current
+        for nbr in get_wiki_links.get_links(current, regex):
 
             # If we found the end, add this path to the global mapping and return
             if nbr == end_url:
+                parents[nbr] = current
                 path = path_traceback(parents, nbr)
                 add_path_to_mapping(path, shortcut_mapping)
                 return path
@@ -52,6 +56,7 @@ def wikipedia_bfs(start_url, end_url, shortcut_mapping):
             # If this nbr is in our global mapping, we should probably see about
             # that shortcut
             elif nbr in shortcut_mapping:
+                parents[nbr] = current
                 print("Found shortcut for " + nbr + " to end")
                 path = path_traceback(parents, nbr)
                 ending = path_traceback(shortcut_mapping, nbr)
@@ -61,7 +66,9 @@ def wikipedia_bfs(start_url, end_url, shortcut_mapping):
                 path_dist = len(curr_path) - 1
 
             else:
-                q.append(nbr)
+                if nbr not in parents:
+                    parents[nbr] = current
+                    q.put(nbr)
 
     return curr_path
 
