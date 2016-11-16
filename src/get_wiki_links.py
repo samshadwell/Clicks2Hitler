@@ -2,6 +2,8 @@ __author__ = 'github.com/samshadwell, github.com/jtschneck'
 
 import urllib.request
 
+MAIN_PAGE = 'http://en.wikipedia.org/wiki/Main_Page'
+
 
 def get_links(url_in, regex):
     """
@@ -17,6 +19,7 @@ def get_links(url_in, regex):
 
     for link in regex.findall(html):
         links_set.add("http://en.wikipedia.org" + link.split("\"")[1])
+    links_set.discard(MAIN_PAGE)
 
     return links_set
 
